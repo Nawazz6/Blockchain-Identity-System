@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="landing-page">
+    <div class="landing-bg"></div>
+    <div class="landing-overlay"></div>
+
+    <div class="landing-content">
+        <div class="landing-badge">Secure Identity Verification Prototype</div>
+
+        <h1 class="landing-title">
+            Quantum Resistant Blockchain Framework
+            <span>for Secure Digital Identity Management</span>
+        </h1>
+
+        <p class="landing-subtitle">
+            A secure and user-controlled identity verification system powered by
+            encryption, SHA-256 hashing, blockchain integrity, and approval-based access.
+        </p>
+
+        <div class="landing-actions">
+            <a href="/login" class="landing-primary-btn">Open Login</a>
+            <a href="/register" class="landing-outline-btn">Create Account</a>
+        </div>
+
+        <div class="landing-card-grid">
+            <div class="portal-card">
+                <div class="portal-card-top">
+                    <div class="portal-icon">L</div>
+                    <div>
+                        <h2>Login</h2>
+                        <p class="card-label">Existing User Access</p>
+                    </div>
+                </div>
+                <p class="portal-text">
+                    Access your secure dashboard, manage uploaded identity documents,
+                    and respond to verification requests.
+                </p>
+                <a href="/login" class="landing-card-btn">Go to Login</a>
+            </div>
+
+            <div class="portal-card">
+                <div class="portal-card-top">
+                    <div class="portal-icon">R</div>
+                    <div>
+                        <h2>Register</h2>
+                        <p class="card-label">New User Enrollment</p>
+                    </div>
+                </div>
+                <p class="portal-text">
+                    Create your identity account, complete OTP verification,
+                    and receive your unique user ID for secure access.
+                </p>
+                <a href="/register" class="landing-card-btn landing-card-btn-secondary">Go to Register</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

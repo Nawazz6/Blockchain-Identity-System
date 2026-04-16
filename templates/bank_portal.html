@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bank-dashboard-shell">
+    <div class="bank-bg"></div>
+    <div class="bank-overlay"></div>
+
+    <div class="bank-dashboard-container">
+        <div class="bank-dashboard-header">
+            <div class="bank-header-badge">Organization Verification Panel</div>
+            <h1>Bank Portal</h1>
+            <p>Search users, send verification requests, and review identity status securely.</p>
+        </div>
+
+        <div class="bank-dashboard-grid">
+
+            <!-- LEFT COLUMN -->
+            <div class="bank-left-column">
+                <div class="bank-panel-card">
+                    <div class="bank-card-head">
+                        <h2>Search User</h2>
+                        <p>Enter organization details and user ID to begin.</p>
+                    </div>
+
+                    <form method="POST" action="/bank" class="bank-form">
+                        <input type="hidden" name="action" value="search">
+
+                        <div class="input-group">
+                            <label>Organization / Bank Name</label>
+                            <input
+                                type="text"
+                                name="bank_name"
+                                placeholder="Enter organization name"
+                                value="{{ bank_name if bank_name else '' }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="input-group">
+                            <label>User ID</label>
+                            <input
+                                type="text"
+                                name="target_user_id"
+                                placeholder="Enter User ID"
+                                value="{{ searched_user_id if searched_user_id else '' }}"
+                                required
+                            >
+                        </div>
+
+                        <button type="submit" class="primary-btn full-btn">Search User</button>
+                    </form>
+                </div>
+
+                {% if user %}
+                <div class="bank-panel-card">
+                    <div class="bank-card-head">
+                        <h2>Send Request</h2>
+                        <p>Send a verification request to the user for approval.</p>
+                    </div>
+
+                    <form method="POST" action="/bank" class="bank-form">
+                        <input type="hidden" name="action" value="send_request">
+                        <input type="hidden" name="target_user_id" value="{{ user['user_id'] }}">
+                        <input type="hidden" name="bank_name" value="{{ bank_name }}">
+
+                        <button type="submit" class="primary-btn accent-btn full-btn">
+                            Send Verification Request
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="bank-right-column">
+                {% if user %}
+                <div class="bank-panel-card">
+                    <div class="bank-card-head">
+                        <h2>User Details</h2>
+                        <p>Basic user information retrieved from the system.</p>
+                    </div>
+
+                    <div class="bank-info-grid">
+                        <div class="bank-info-box">
+                            <span>Name</span>
+                            <strong>{{ user["first_name"] }} {{ user["last_name"] }}</strong>
+                        </div>
+
+                        <div class="bank-info-box">
+                            <span>User ID</span>
+                            <strong>{{ user["user_id"] }}</strong>
+                        </div>
+
+                        <div class="bank-info-box">
+                            <span>Email</span>
+                            <strong>{{ user["email"] }}</strong>
+                        </div>
+
+                        <div class="bank-info-box">
+                            <span>Phone</span>
+                            <strong>{{ user["phone"] }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bank-panel-card">
+                    <div class="bank-card-head">
+                        <h2>Verification Summary</h2>
+                        <p>Current request and identity verification status.</p>
+                    </div>
+
+                    <div class="bank-status-list">
+                        <div class="bank-status-row">
+                            <span>Aadhaar Uploaded</span>
+                            <strong>
+                                {% if aadhaar_record %}
+                                    <span class="status-pill success-pill">Yes</span>
+                                {% else %}
+                                    <span class="status-pill pending-pill">No</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="bank-status-row">
+                            <span>UIDAI Verification</span>
+                            <strong>
+                                {% if aadhaar_record and aadhaar_record["uidai_verified"] == 1 %}
+                                    <span class="status-pill success-pill">Verified</span>
+                                {% elif aadhaar_record %}
+                                    <span class="status-pill danger-pill">Not Verified</span>
+                                {% else %}
+                                    <span class="status-pill neutral-pill">Not Available</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="bank-status-row">
+                            <span>Latest Request Status</span>
+                            <strong>
+                                {% if latest_request %}
+                                    {% if latest_request["status"] == "Approved" %}
+                                        <span class="status-pill success-pill">{{ latest_request["status"] }}</span>
+                                    {% elif latest_request["status"] == "Rejected" %}
+                                        <span class="status-pill danger-pill">{{ latest_request["status"] }}</span>
+                                    {% else %}
+                                        <span class="status-pill pending-pill">{{ latest_request["status"] }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="status-pill neutral-pill">No Request Sent</span>
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="bank-status-row">
+                            <span>Requested By</span>
+                            <strong>
+                                {% if latest_request %}
+                                    {{ latest_request["bank_name"] }}
+                                {% else %}
+                                    {{ bank_name if bank_name else 'Not Available' }}
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div class="bank-status-row">
+                            <span>Requested At</span>
+                            <strong>
+                                {% if latest_request %}
+                                    {{ latest_request["request_time"] }}
+                                {% else %}
+                                    Not Requested Yet
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                {% if verification_message %}
+                <div class="bank-panel-card">
+                    <div class="bank-card-head">
+                        <h2>Final Status</h2>
+                        <p>Outcome based on request approval and identity verification.</p>
+                    </div>
+
+                    <div class="bank-final-status {% if identity_verified %}verified-status{% else %}pending-status{% endif %}">
+                        <h3>{{ verification_message }}</h3>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="bank-empty-card">
+                    <div class="bank-empty-icon">B</div>
+                    <h2>Bank Verification Dashboard</h2>
+                    <p>Enter the organization name and user ID to search for a user and begin the verification workflow.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

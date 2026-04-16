@@ -1,0 +1,17 @@
+[
+  {
+    "aadhaar_number": "123412341234",
+    "full_name": "Ayaan Khan",
+    "phone": "9876543210"
+  },
+  {
+    "aadhaar_number": "555566667777",
+    "full_name": "Sara Ali",
+    "phone": "9123456780"
+  },
+  {
+    "aadhaar_number": "111122223333",
+    "full_name": "Rahul Mehta",
+    "phone": "9988776655"
+  }
+]

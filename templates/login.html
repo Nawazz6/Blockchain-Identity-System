@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-background"></div>
+    <div class="auth-overlay"></div>
+
+    <div class="auth-form-card login-card">
+        <div class="auth-header">
+            <div class="auth-badge">Secure User Access</div>
+            <h1>User Login</h1>
+            <p>Login using your generated User ID and password</p>
+        </div>
+
+        <form action="/login" method="POST" id="loginForm">
+            <div class="input-group">
+                <label>User ID</label>
+                <input type="text" name="user_id" required placeholder="Enter your User ID">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <div class="password-field">
+                    <input type="password" id="loginPassword" name="password" required placeholder="Enter password">
+                    <button type="button" class="toggle-btn" onclick="togglePassword('loginPassword', this)">Show</button>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-primary-btn full-btn">Login</button>
+        </form>
+
+        <div class="auth-bottom-link">
+            Don’t have an account?
+            <a href="/register">Register here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

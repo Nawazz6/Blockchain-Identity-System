@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-background"></div>
+    <div class="auth-overlay"></div>
+
+    <div class="auth-form-card register-card">
+        <div class="auth-header">
+            <div class="auth-badge">Secure User Enrollment</div>
+            <h1>User Registration</h1>
+            <p>Create your account to access the secure identity dashboard</p>
+        </div>
+
+        <form action="/generate-otp" method="POST" id="registerForm">
+            <div class="form-grid two-column">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" required value="{{ first_name if first_name else '' }}" placeholder="Enter first name">
+                </div>
+
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" required value="{{ last_name if last_name else '' }}" placeholder="Enter last name">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required value="{{ email if email else '' }}" placeholder="Enter email address">
+            </div>
+
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone" required value="{{ phone if phone else '' }}" placeholder="Enter phone number">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <div class="password-field">
+                    <input type="password" id="registerPassword" name="password" required value="{{ password if password else '' }}" placeholder="Create password">
+                    <button type="button" class="toggle-btn" onclick="togglePassword('registerPassword', this)">Show</button>
+                </div>
+                <div class="password-hint">
+                    Minimum 8 characters, with uppercase, lowercase and number.
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Captcha Verification</label>
+                <div class="captcha-row">
+                    <div class="captcha-display" id="registerCaptchaQuestion">5 + 2 = ?</div>
+                    <button type="button" class="captcha-btn" onclick="generateCaptcha('register')">Refresh</button>
+                </div>
+                <input type="text" id="registerCaptchaAnswer" placeholder="Enter captcha answer" required>
+                <input type="hidden" id="registerCaptchaExpected">
+            </div>
+
+            <button type="submit" class="auth-primary-btn full-btn" onclick="return validateRegisterForm()">Generate OTP</button>
+        </form>
+
+        {% if demo_otp %}
+        <div class="otp-panel">
+            <div class="otp-label">Demo OTP sent to {{ phone }}</div>
+            <div class="otp-number">{{ demo_otp }}</div>
+            <div class="otp-note">
+                This is a demo OTP flow used for prototype presentation.
+            </div>
+        </div>
+
+        <form action="/register" method="POST" class="otp-verify-form">
+            <input type="hidden" name="first_name" value="{{ first_name }}">
+            <input type="hidden" name="last_name" value="{{ last_name }}">
+            <input type="hidden" name="email" value="{{ email }}">
+            <input type="hidden" name="phone" value="{{ phone }}">
+            <input type="hidden" name="password" value="{{ password }}">
+            <input type="hidden" name="generated_otp" value="{{ demo_otp }}">
+
+            <div class="input-group">
+                <label>Enter OTP</label>
+                <input type="text" name="entered_otp" required placeholder="Enter OTP">
+            </div>
+
+            <button type="submit" class="auth-primary-btn auth-accent-btn full-btn">Verify OTP & Register</button>
+        </form>
+        {% endif %}
+
+        <div class="auth-bottom-link">
+            Already have an account?
+            <a href="/login">Login here</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+        generateCaptcha("register");
+    });
+</script>
+{% endblock %}

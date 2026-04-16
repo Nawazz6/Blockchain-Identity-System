@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-shell">
+    <div class="dashboard-bg"></div>
+    <div class="dashboard-overlay"></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-badge">Secure User Panel</div>
+            <h2>User Portal</h2>
+            <p>{{ user_name }}</p>
+            <span>{{ user_id }}</span>
+        </div>
+
+        <nav class="sidebar-menu">
+            <button class="sidebar-link active" onclick="showDashboardSection('overview', this)">Overview</button>
+            <button class="sidebar-link" onclick="showDashboardSection('uploadSection', this)">Upload Aadhaar</button>
+            <button class="sidebar-link" onclick="showDashboardSection('verificationSection', this)">Aadhaar Verification</button>
+            <button class="sidebar-link" onclick="showDashboardSection('requestSection', this)">Pending Requests</button>
+            <a href="/logout" class="sidebar-link logout-btn">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main-panel">
+        <section id="overview" class="dashboard-section-panel active-panel">
+            <div class="panel-header">
+                <div>
+                    <div class="section-tag">Dashboard Summary</div>
+                    <h1>Overview</h1>
+                </div>
+            </div>
+
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <span>User ID</span>
+                    <h3>{{ user_id }}</h3>
+                </div>
+
+                <div class="overview-card">
+                    <span>Aadhaar Status</span>
+                    <h3>
+                        {% if aadhaar_record %}
+                            Uploaded
+                        {% else %}
+                            Not Uploaded
+                        {% endif %}
+                    </h3>
+                </div>
+
+                <div class="overview-card">
+                    <span>Verification</span>
+                    <h3>
+                        {% if aadhaar_record and aadhaar_record["uidai_verified"] == 1 %}
+                            Verified
+                        {% elif aadhaar_record %}
+                            Not Verified
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </h3>
+                </div>
+
+                <div class="overview-card">
+                    <span>Requests</span>
+                    <h3>{{ requests|length }}</h3>
+                </div>
+            </div>
+
+            <div class="panel-card info-panel">
+                <h3>Identity Security Workflow</h3>
+                <p>
+                    This dashboard allows the user to upload Aadhaar securely, verify identity using the mock UIDAI layer,
+                    and manage incoming verification requests through an approval-based access mechanism.
+                </p>
+            </div>
+        </section>
+
+        <section id="uploadSection" class="dashboard-section-panel">
+            <div class="panel-header">
+                <div>
+                    <div class="section-tag">Document Upload</div>
+                    <h1>Upload Aadhaar</h1>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                <form method="POST" action="/user/upload-aadhaar" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <label>Aadhaar Number</label>
+                        <input type="text" name="aadhaar_number" required placeholder="Enter Aadhaar number">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Upload File</label>
+                        <input type="file" name="aadhaar_file" required>
+                    </div>
+
+                    <button type="submit" class="primary-btn">Upload Aadhaar</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="verificationSection" class="dashboard-section-panel">
+            <div class="panel-header">
+                <div>
+                    <div class="section-tag">Verification Details</div>
+                    <h1>Aadhaar Verification</h1>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                {% if aadhaar_record %}
+                    <div class="details-grid">
+                        <div class="detail-box">
+                            <span>Aadhaar Number</span>
+                            <strong>{{ aadhaar_record["aadhaar_number"] }}</strong>
+                        </div>
+
+                        <div class="detail-box">
+                            <span>Original File</span>
+                            <strong>{{ aadhaar_record["original_filename"] }}</strong>
+                        </div>
+
+                        <div class="detail-box">
+                            <span>Encrypted File</span>
+                            <strong>{{ aadhaar_record["encrypted_filename"] }}</strong>
+                        </div>
+
+                        <div class="detail-box">
+                            <span>UIDAI Status</span>
+                            <strong>
+                                {% if aadhaar_record["uidai_verified"] == 1 %}
+                                    Verified
+                                {% else %}
+                                    Not Verified
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-box">No Aadhaar uploaded yet.</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section id="requestSection" class="dashboard-section-panel">
+            <div class="panel-header">
+                <div>
+                    <div class="section-tag">Access Requests</div>
+                    <h1>Pending Requests</h1>
+                </div>
+            </div>
+
+            <div class="panel-card">
+                {% if requests %}
+                    {% for req in requests %}
+                        <div class="request-item">
+                            <div class="request-info">
+                                <h3>{{ req["bank_name"] }}</h3>
+                                <p>Status: {{ req["status"] }}</p>
+                                <p>Requested At: {{ req["request_time"] }}</p>
+                            </div>
+
+                            {% if req["status"] == "Pending" %}
+                            <div class="request-actions">
+                                <a href="/user/request-action/{{ req['id'] }}/approve" class="primary-btn accent-btn">Approve</a>
+                                <a href="/user/request-action/{{ req['id'] }}/reject" class="primary-btn danger-btn">Reject</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-box">No requests available.</div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
